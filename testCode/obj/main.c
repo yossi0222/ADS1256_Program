@@ -32,7 +32,7 @@ int main(void)
 
     while(1){
 
-        // printf("0 : %f\r\n",ADS1256_GetChannalValue(0)*5.0/0x7fffff);
+        printf("0 : %f\r\n",ADS1256_GetChannalValue(0)*5.0/0x7fffff);
         printf("1 : %f\r\n",ADS1256_GetChannalValue(1)*5.0/0x7fffff);
         // printf("2 : %f\r\n",ADS1256_GetChannalValue(2)*5.0/0x7fffff);
         // printf("3 : %f\r\n",ADS1256_GetChannalValue(3)*5.0/0x7fffff);
