@@ -34,7 +34,6 @@ int main(void)
 
         printf("1 : %f\r\n",ADS1256_GetChannalValue(1)*5.0/0x7fffff);
         
-        printf("\33[1A");//Move the cursor up 1 lines
     }
     return 0;
 }
