@@ -43,6 +43,7 @@ int main(void)
     clock_gettime(CLOCK_MONOTONIC, &current_time);
 
     float data_buffer[SAMPLE_COUNT]; // データを一時的に保存するバッファ
+    int time_buffer[SAMPLE_COUNT];   // 時間を保存するバッファ
     int data_index = 0;
 
     while ((current_time.tv_sec - start_time.tv_sec) < 5) // 5秒間ループする
@@ -52,6 +53,7 @@ int main(void)
         if (data_index < SAMPLE_COUNT)
         {
             data_buffer[data_index] = ADS1256_GetChannalValue(1) * 5.0 / 0x7fffff;
+            time_buffer[data_index] = elapsed_time.tv_sec - start_time.tv_sec;
             data_index++;
         }
 
@@ -60,10 +62,11 @@ int main(void)
         clock_gettime(CLOCK_MONOTONIC, &current_time);
     }
 
-    // データを一気に出力
+    // データと時間を一気に出力
+    printf("Time | Data\n");
     for (int i = 0; i < data_index; i++)
     {
-        printf("Data %d: %f\n", i + 1, data_buffer[i]);
+        printf("%d    | %f\n", time_buffer[i], data_buffer[i]);
     }
 
     return 0;
