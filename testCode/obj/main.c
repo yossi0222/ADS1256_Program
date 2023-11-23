@@ -1,5 +1,5 @@
-#include <stdlib.h>     //exit()
-#include <signal.h>     //signal()
+#include <stdlib.h>     
+#include <signal.h>     
 #include <time.h>
 #include "ADS1256.h"
 #include "stdio.h"
@@ -33,6 +33,7 @@ int main(void)
     while(1){
 
         printf("1 : %f\r\n",ADS1256_GetChannalValue(1)*5.0/0x7fffff);
+        
         
     }
     return 0;
