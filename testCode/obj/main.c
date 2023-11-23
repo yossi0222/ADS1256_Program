@@ -6,6 +6,7 @@
 #include <time.h>
 #include <string.h>
 #include <sys/timeb.h>
+
 void  Handler(int signo)
 {
     //System Exit
@@ -17,24 +18,35 @@ void  Handler(int signo)
 
 int main(void)
 {
-    UDOUBLE ADC[8],i;
+    UDOUBLE ADC[8], i;
     printf("demo\r\n");
     DEV_ModuleInit();
     
-    // Exception handling:ctrl + c
+    // Exception handling: ctrl + c
     signal(SIGINT, Handler);
 
-    if(ADS1256_init() == 1){
+    if (ADS1256_init() == 1){
         printf("\r\nEND                  \r\n");
         DEV_ModuleExit();
         exit(0);
     }
 
-    while(1){
+    struct timespec delay_time;
+    delay_time.tv_sec = 0;  // 10マイクロ秒 = 0秒
+    delay_time.tv_nsec = 10000; // ナノ秒単位で10マイクロ秒 = 10000ナノ秒
 
-        printf("1 : %f\r\n",ADS1256_GetChannalValue(1)*5.0/0x7fffff);
+    struct timespec start_time, current_time;
+    clock_gettime(CLOCK_MONOTONIC, &start_time);
+    clock_gettime(CLOCK_MONOTONIC, &current_time);
+
+    while ((current_time.tv_sec - start_time.tv_sec) < 5) {  // 5秒間ループする
+
+        printf("1 : %f\r\n", ADS1256_GetChannalValue(1) * 5.0 / 0x7fffff);
         
-        
+        nanosleep(&delay_time, NULL);  // 10マイクロ秒待つ
+
+        clock_gettime(CLOCK_MONOTONIC, &current_time);
     }
+
     return 0;
 }
