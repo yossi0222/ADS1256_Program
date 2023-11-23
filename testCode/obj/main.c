@@ -43,7 +43,7 @@ int main(void)
     clock_gettime(CLOCK_MONOTONIC, &current_time);
 
     float data_buffer[SAMPLE_COUNT]; // データを一時的に保存するバッファ
-    int time_buffer[SAMPLE_COUNT];   // 時間を保存するバッファ
+    long int time_buffer[SAMPLE_COUNT];   // 時間を保存するバッファ
     int data_index = 0;
 
     while ((current_time.tv_sec - start_time.tv_sec) < 5) // 5秒間ループする
@@ -66,7 +66,7 @@ int main(void)
     printf("Time | Data\n");
     for (int i = 0; i < data_index; i++)
     {
-        printf("%d    | %f\n", time_buffer[i], data_buffer[i]);
+        printf("%ld    | %f\n", time_buffer[i], data_buffer[i]);
     }
 
     return 0;
