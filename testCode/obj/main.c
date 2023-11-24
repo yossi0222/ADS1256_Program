@@ -8,7 +8,8 @@
 #include <sys/timeb.h>
 #include <unistd.h> // usleep関数を利用するため
 
-#define SAMPLE_COUNT 500  // データを保存するサンプル数
+#define SAMPLE_COUNT 10000  // データを保存するサンプル数
+#define SAMPLING_PERIOD 100 // マイクロ秒単位でのサンプリング周期 (1秒 / 10kHz = 100μs)
 
 int main(void)
 {
@@ -29,23 +30,25 @@ int main(void)
     clock_gettime(CLOCK_MONOTONIC, &current_time);
 
     int data_index = 0;
-    struct timespec sleep_time = {0, 1000}; // 1μ秒ごとの待機時間を設定（nanosleep()関数はナノ秒単位で待機）
+    struct timespec sleep_time = {0, SAMPLING_PERIOD * 1000}; // サンプリング周期に合わせて待機時間を設定
 
     while (data_index < SAMPLE_COUNT) // サンプル数だけデータを取得する
     {
+        // データ取得前の時間を取得
+        clock_gettime(CLOCK_MONOTONIC, &current_time);
+
         // データを取得してバッファに保存
         data_buffer[data_index] = ADS1256_GetChannalValue(1) * 5.0 / 0x7fffff;
         data_index++;
 
-        // 待機時間を使って1μ秒待つ
-        nanosleep(&sleep_time, NULL);
-    }
+        // データ取得後の時間とデータを表示
+        printf("Time: %ld seconds, %ld nanoseconds | Data: %f\n",
+               current_time.tv_sec - start_time.tv_sec,
+               current_time.tv_nsec - start_time.tv_nsec,
+               data_buffer[data_index - 1]);
 
-    // データと時間を一気に出力
-    printf("Data\n");
-    for (int i = 0; i < data_index; i++)
-    {
-        printf("%f\n", data_buffer[i]);
+        // サンプリング周期に合わせて待機時間を調整
+        nanosleep(&sleep_time, NULL);
     }
 
     DEV_ModuleExit();
