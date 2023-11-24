@@ -10,6 +10,7 @@
 
 #define SAMPLE_COUNT 10000  // データを保存するサンプル数
 #define SAMPLING_PERIOD 100 // マイクロ秒単位でのサンプリング周期 (1秒 / 10kHz = 100μs)
+#define TARGET_TIME 1 // 目標の取得時間（秒）
 
 int main(void)
 {
@@ -27,25 +28,24 @@ int main(void)
     float data_buffer[SAMPLE_COUNT]; // データを一時的に保存するバッファ
     struct timespec start_time, current_time;
     clock_gettime(CLOCK_MONOTONIC, &start_time);
-    clock_gettime(CLOCK_MONOTONIC, &current_time);
 
     int data_index = 0;
     struct timespec sleep_time = {0, SAMPLING_PERIOD * 1000}; // サンプリング周期に合わせて待機時間を設定
 
-    while (data_index < SAMPLE_COUNT) // サンプル数だけデータを取得する
+    while (current_time.tv_sec - start_time.tv_sec < TARGET_TIME) // 目標の時間までデータを取得する
     {
         // データ取得前の時間を取得
         clock_gettime(CLOCK_MONOTONIC, &current_time);
 
         // データを取得してバッファに保存
         data_buffer[data_index] = ADS1256_GetChannalValue(1) * 5.0 / 0x7fffff;
-        data_index++;
+        
+        // データ取得時の時間とデータを表示（ナノ秒単位）
+        printf("Time: %ld nanoseconds | Data: %f\n",
+               (current_time.tv_sec - start_time.tv_sec) * 1000000000 + (current_time.tv_nsec - start_time.tv_nsec),
+               data_buffer[data_index]);
 
-        // データ取得後の時間とデータを表示
-        printf("Time: %ld seconds, %ld nanoseconds | Data: %f\n",
-               current_time.tv_sec - start_time.tv_sec,
-               current_time.tv_nsec - start_time.tv_nsec,
-               data_buffer[data_index - 1]);
+        data_index++;
 
         // サンプリング周期に合わせて待機時間を調整
         nanosleep(&sleep_time, NULL);
