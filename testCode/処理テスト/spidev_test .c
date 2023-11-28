@@ -1,14 +1,14 @@
 /*
- * SPI テスト ユーティリティ (spidev ドライバーを使用)
+ * SPI testing utility (using spidev driver)
  *
- * 著作権 (c) 2007 MontaVista Software, Inc.
- * 著作権 (c) 2007 Anton Vorontsov <avorontsov@ru.mvista.com>
+ * Copyright (c) 2007  MontaVista Software, Inc.
+ * Copyright (c) 2007  Anton Vorontsov <avorontsov@ru.mvista.com>
  *
- * このプログラムはフリーソフトウェアです。再配布および/または変更することができます
- * これは、GNU General Public License の条件に基づいて発行されます。
- * フリーソフトウェア財団。ライセンスのバージョン 2 のいずれか。
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License.
  *
- * Cross-gcc -I/path/to/cross-kernel/include によるクロスコンパイル
+ * Cross-compile with cross-gcc -I/path/to/cross-kernel/include
  */
 
 #include <stdint.h>
@@ -25,82 +25,82 @@
 
 static void pabort(const char *s)
 {
-	エラー;
-	アボート（）;
+	perror(s);
+	abort();
 }
 
 static const char *device = "/dev/spidev1.1";
-静的 uint8_t モード;
-静的 uint8_t ビット = 8;
-静的 uint32_t 速度 = 500000;
-静的 uint16_t 遅延。
+static uint8_t mode;
+static uint8_t bits = 8;
+static uint32_t speed = 500000;
+static uint16_t delay;
 
-静的ボイド転送(int fd)
+static void transfer(int fd)
 {
 	int ret;
 	uint8_t tx[] = {
-		0xFF、0xFF、0xFF、0xFF、0xFF、0xFF、
-		0x40、0x00、0x00、0x00、0x00、0x95、
-		0xFF、0xFF、0xFF、0xFF、0xFF、0xFF、
-		0xFF、0xFF、0xFF、0xFF、0xFF、0xFF、
-		0xFF、0xFF、0xFF、0xFF、0xFF、0xFF、
-		0xDE、0xAD、0xBE、0xEF、0xBA、0xAD、
-		0xF0、0x0D、
+		0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+		0x40, 0x00, 0x00, 0x00, 0x00, 0x95,
+		0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+		0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+		0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+		0xDE, 0xAD, 0xBE, 0xEF, 0xBA, 0xAD,
+		0xF0, 0x0D,
 	};
 	uint8_t rx[ARRAY_SIZE(tx)] = {0, };
 	struct spi_ioc_transfer tr = {
-		.tx_buf = (符号なしロング)tx、
-		.rx_buf = (符号なし長)rx、
-		.len = ARRAY_SIZE(tx)、
-		.lay_usecs = 遅延、
-		.speed_hz = 速度、
-		.bits_per_word = ビット、
+		.tx_buf = (unsigned long)tx,
+		.rx_buf = (unsigned long)rx,
+		.len = ARRAY_SIZE(tx),
+		.delay_usecs = delay,
+		.speed_hz = speed,
+		.bits_per_word = bits,
 	};
 
 	ret = ioctl(fd, SPI_IOC_MESSAGE(1), &tr);
 	if (ret < 1)
-		pabort("spi メッセージを送信できません");
+		pabort("can't send spi message");
 
 	for (ret = 0; ret < ARRAY_SIZE(tx); ret++) {
 		if (!(ret % 6))
-			put("");
+			puts("");
 		printf("%.2X ", rx[ret]);
 	}
-	put("");
+	puts("");
 }
 
 static void print_usage(const char *prog)
 {
-	printf("使用法: %s [-DsbdlHOLC3]\n", prog);
-	put(" -D --device 使用するデバイス (デフォルト /dev/spidev1.1)\n"
-	     " -s --speed 最大速度 (Hz)\n"
-	     " -d --lay 遅延 (usec)\n"
-	     " -b --bpw ワードあたりのビット数 \n"
-	     " -l --loop ループバック\n"
-	     " -H --cpha クロック位相\n"
-	     " -O --cpol クロック極性\n"
-	     " -L --lsb 最下位ビットが最初\n"
-	     " -C --cs-high チップ選択アクティブ High\n"
-	     " -3 --3wire SI/SO 信号が共有されました\n");
-	終了(1);
+	printf("Usage: %s [-DsbdlHOLC3]\n", prog);
+	puts("  -D --device   device to use (default /dev/spidev1.1)\n"
+	     "  -s --speed    max speed (Hz)\n"
+	     "  -d --delay    delay (usec)\n"
+	     "  -b --bpw      bits per word \n"
+	     "  -l --loop     loopback\n"
+	     "  -H --cpha     clock phase\n"
+	     "  -O --cpol     clock polarity\n"
+	     "  -L --lsb      least significant bit first\n"
+	     "  -C --cs-high  chip select active high\n"
+	     "  -3 --3wire    SI/SO signals shared\n");
+	exit(1);
 }
 
 static void parse_opts(int argc, char *argv[])
 {
-	一方 (1) {
-		static const struct オプション lopts[] = {
-			{ "デバイス", 1, 0, 'D' },
-			{ "速度", 1, 0, 's' },
-			{ "遅延", 1, 0, 'd' },
-			{ "bpw", 1, 0, 'b' },
-			{ "ループ", 0, 0, 'l' },
-			{ "cpha", 0, 0, 'H' },
-			{ "cpol", 0, 0, 'O' },
-			{ "lsb", 0, 0, 'L' },
+	while (1) {
+		static const struct option lopts[] = {
+			{ "device",  1, 0, 'D' },
+			{ "speed",   1, 0, 's' },
+			{ "delay",   1, 0, 'd' },
+			{ "bpw",     1, 0, 'b' },
+			{ "loop",    0, 0, 'l' },
+			{ "cpha",    0, 0, 'H' },
+			{ "cpol",    0, 0, 'O' },
+			{ "lsb",     0, 0, 'L' },
 			{ "cs-high", 0, 0, 'C' },
-			{ "3wire", 0, 0, '3' },
-			{ "no-cs", 0, 0, 'N' },
-			{ "準備完了", 0, 0, 'R' },
+			{ "3wire",   0, 0, '3' },
+			{ "no-cs",   0, 0, 'N' },
+			{ "ready",   0, 0, 'R' },
 			{ NULL, 0, 0, 0 },
 		};
 		int c;
@@ -108,48 +108,48 @@ static void parse_opts(int argc, char *argv[])
 		c = getopt_long(argc, argv, "D:s:d:b:lHOLC3NR", lopts, NULL);
 
 		if (c == -1)
-			壊す;
+			break;
 
-		スイッチ (c) {
-		ケース「D」:
-			デバイス = オプターグ;
-			壊す;
-		ケース:
-			速度 = atoi(optarg);
-			壊す;
-		ケース「d」:
-			遅延 = atoi(optarg);
-			壊す;
-		ケース「b」:
-			ビット = atoi(optarg);
-			壊す;
-		ケース「l」:
-			モード |= SPI_LOOP;
-			壊す;
-		ケース「H」:
-			モード |= SPI_CPHA;
-			壊す;
-		ケース「O」:
-			モード |= SPI_CPOL;
-			壊す;
-		ケース「L」:
-			モード |= SPI_LSB_FIRST;
-			壊す;
-		ケース「C」:
-			モード |= SPI_CS_HIGH;
-			壊す;
-		ケース「3」:
-			モード |= SPI_3WIRE;
-			壊す;
-		ケース「N」:
-			モード |= SPI_NO_CS;
-			壊す;
-		ケース「R」:
-			モード |= SPI_READY;
-			壊す;
-		デフォルト：
+		switch (c) {
+		case 'D':
+			device = optarg;
+			break;
+		case 's':
+			speed = atoi(optarg);
+			break;
+		case 'd':
+			delay = atoi(optarg);
+			break;
+		case 'b':
+			bits = atoi(optarg);
+			break;
+		case 'l':
+			mode |= SPI_LOOP;
+			break;
+		case 'H':
+			mode |= SPI_CPHA;
+			break;
+		case 'O':
+			mode |= SPI_CPOL;
+			break;
+		case 'L':
+			mode |= SPI_LSB_FIRST;
+			break;
+		case 'C':
+			mode |= SPI_CS_HIGH;
+			break;
+		case '3':
+			mode |= SPI_3WIRE;
+			break;
+		case 'N':
+			mode |= SPI_NO_CS;
+			break;
+		case 'R':
+			mode |= SPI_READY;
+			break;
+		default:
 			print_usage(argv[0]);
-			壊す;
+			break;
 		}
 	}
 }
@@ -161,50 +161,50 @@ int main(int argc, char *argv[])
 
 	parse_opts(argc, argv);
 
-	fd = オープン(デバイス, O_RDWR);
+	fd = open(device, O_RDWR);
 	if (fd < 0)
-		pabort("デバイスを開けません");
+		pabort("can't open device");
 
 	/*
-	 * スパイモード
+	 * spi mode
 	 */
 	ret = ioctl(fd, SPI_IOC_WR_MODE, &mode);
 	if (ret == -1)
-		pabort("spi モードを設定できません");
+		pabort("can't set spi mode");
 
 	ret = ioctl(fd, SPI_IOC_RD_MODE, &mode);
 	if (ret == -1)
-		pabort("spi モードを取得できません");
+		pabort("can't get spi mode");
 
 	/*
-	 * ワードあたりのビット数
+	 * bits per word
 	 */
 	ret = ioctl(fd, SPI_IOC_WR_BITS_PER_WORD, &bits);
 	if (ret == -1)
-		pabort("ワードあたりのビット数を設定できません");
+		pabort("can't set bits per word");
 
 	ret = ioctl(fd, SPI_IOC_RD_BITS_PER_WORD, &bits);
 	if (ret == -1)
-		pabort("ワードあたりのビット数を取得できません");
+		pabort("can't get bits per word");
 
 	/*
-	 * 最大速度 Hz
+	 * max speed hz
 	 */
 	ret = ioctl(fd, SPI_IOC_WR_MAX_SPEED_HZ, &speed);
 	if (ret == -1)
-		pabort("最大速度 hz を設定できません");
+		pabort("can't set max speed hz");
 
 	ret = ioctl(fd, SPI_IOC_RD_MAX_SPEED_HZ, &speed);
 	if (ret == -1)
-		pabort("最大速度 hz を取得できません");
+		pabort("can't get max speed hz");
 
-	printf("spi モード: %d\n", モード);
-	printf("ワードあたりのビット数: %d\n", ビット);
-	printf("最大速度: %d Hz (%d KHz)\n", 速度, 速度/1000);
+	printf("spi mode: %d\n", mode);
+	printf("bits per word: %d\n", bits);
+	printf("max speed: %d Hz (%d KHz)\n", speed, speed/1000);
 
-	転送(fd);
+	transfer(fd);
 
-	閉じる(fd);
+	close(fd);
 
-	retを返します。
+	return ret;
 }
