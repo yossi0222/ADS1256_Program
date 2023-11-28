@@ -37,7 +37,7 @@ int main(void)
         data_buffer[data_index] = ADS1256_GetChannalValue(1) * 5.0 / 0x7fffff;
 
         // データ取得時の時間とデータを表示（ナノ秒単位）
-        printf("Time: %lld nanoseconds | Data: %f\n",
+        printf("%lld %f\n",
                (long long)((current_time.tv_sec - start_time.tv_sec) * 1000000000LL +
                            (current_time.tv_nsec - start_time.tv_nsec)),
                data_buffer[data_index]);
