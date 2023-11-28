@@ -23,6 +23,7 @@ int main(void)
     }
 
     float data_buffer[SAMPLE_COUNT]; // データを一時的に保存するバッファ
+    long long time_buffer[SAMPLE_COUNT]; // 時間経過を一時的に保存するバッファ
     struct timespec start_time, current_time;
     timespec_get(&start_time, TIME_UTC); // 現在の時間を取得
 
@@ -36,17 +37,20 @@ int main(void)
         // データを取得してバッファに保存
         data_buffer[data_index] = ADS1256_GetChannalValue(1) * 5.0 / 0x7fffff;
 
+        // 時間経過を保存
+        time_buffer[data_index] = (current_time.tv_sec - start_time.tv_sec) * 1000000000LL + (current_time.tv_nsec - start_time.tv_nsec);
+
         data_index++;
 
         // サンプリング周期に合わせて待機時間を調整
         nanosleep(&sleep_time, NULL);
     }
 
-    // データを一気に出力
-    printf("Data\n");
+    // データと時間経過を一気に出力
+    printf("Data and Time\n");
     for (int i = 0; i < data_index; i++)
     {
-        printf("%f\n", data_buffer[i]);
+        printf("Time: %lld nanoseconds | Data: %f\n", time_buffer[i], data_buffer[i]);
     }
 
     DEV_ModuleExit();
