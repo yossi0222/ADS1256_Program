@@ -3,9 +3,6 @@
 #include <time.h>
 #include "ADS1256.h"
 #include "stdio.h"
-#include <time.h>
-#include <string.h>
-#include <sys/timeb.h>
 #include <unistd.h> // usleep関数を利用するため
 
 #define SAMPLE_COUNT 10000  // データを保存するサンプル数
@@ -27,22 +24,22 @@ int main(void)
 
     float data_buffer[SAMPLE_COUNT]; // データを一時的に保存するバッファ
     struct timespec start_time, current_time;
-    clock_gettime(CLOCK_MONOTONIC, &start_time);
+    timespec_get(&start_time, TIME_UTC); // 現在の時間を取得
 
     int data_index = 0;
     struct timespec sleep_time = {0, SAMPLING_PERIOD * 1000}; // サンプリング周期に合わせて待機時間を設定
 
-    while (current_time.tv_sec - start_time.tv_sec < TARGET_TIME) // 目標の時間までデータを取得する
+    while ((current_time.tv_sec - start_time.tv_sec) < TARGET_TIME) // 目標の時間までデータを取得する
     {
-        // データ取得前の時間を取得
-        clock_gettime(CLOCK_MONOTONIC, &current_time);
+        timespec_get(&current_time, TIME_UTC); // 現在の時間を取得
 
         // データを取得してバッファに保存
         data_buffer[data_index] = ADS1256_GetChannalValue(1) * 5.0 / 0x7fffff;
-        
+
         // データ取得時の時間とデータを表示（ナノ秒単位）
-        printf("Time: %ld nanoseconds | Data: %f\n",
-               (current_time.tv_sec - start_time.tv_sec) * 1000000000 + (current_time.tv_nsec - start_time.tv_nsec),
+        printf("Time: %lld nanoseconds | Data: %f\n",
+               (long long)((current_time.tv_sec - start_time.tv_sec) * 1000000000LL +
+                           (current_time.tv_nsec - start_time.tv_nsec)),
                data_buffer[data_index]);
 
         data_index++;
