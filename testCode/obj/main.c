@@ -36,16 +36,17 @@ int main(void)
         // データを取得してバッファに保存
         data_buffer[data_index] = ADS1256_GetChannalValue(1) * 5.0 / 0x7fffff;
 
-        // データ取得時の時間とデータを表示（ナノ秒単位）
-        printf("%lld %f\n",
-               (long long)((current_time.tv_sec - start_time.tv_sec) * 1000000000LL +
-                           (current_time.tv_nsec - start_time.tv_nsec)),
-               data_buffer[data_index]);
-
         data_index++;
 
         // サンプリング周期に合わせて待機時間を調整
         nanosleep(&sleep_time, NULL);
+    }
+
+    // データを一気に出力
+    printf("Data\n");
+    for (int i = 0; i < data_index; i++)
+    {
+        printf("%f\n", data_buffer[i]);
     }
 
     DEV_ModuleExit();
