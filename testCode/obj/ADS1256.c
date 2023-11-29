@@ -246,7 +246,7 @@ static UDOUBLE ADS1256_Read_ADC_Data(void)
     DEV_Delay_ms(1);
     DEV_Digital_Write(DEV_CS_PIN, 0);
     DEV_SPI_WriteByte(CMD_RDATA);
-    DEV_Delay_ms(1);
+    DEV_Delay_μs(1);
     buf[0] = DEV_SPI_ReadByte();
     buf[1] = DEV_SPI_ReadByte();
     buf[2] = DEV_SPI_ReadByte();
