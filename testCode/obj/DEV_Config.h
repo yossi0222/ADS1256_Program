@@ -65,7 +65,7 @@
  * delay x ms
 **/
 #define DEV_Delay_ms(__xms) bcm2835_delay(__xms)
-#define DEV_Delay_ns(_xns) bcm2835_delayMicroseconds(_xns)
+#define DEV_Delay_micro(_xns) bcm2835_delayMicroseconds(_xns)
 
 
 /*------------------------------------------------------------------------------------------------------*/
