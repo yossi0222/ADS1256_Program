@@ -87,7 +87,7 @@ static UBYTE ADS1256_Read_data(UBYTE Reg)
     DEV_Digital_Write(DEV_CS_PIN, 0);
     DEV_SPI_WriteByte(CMD_RREG | Reg);
     DEV_SPI_WriteByte(0x00);
-    DEV_Delay_ms(1);
+    DEV_Delay_ms(0.1);
     temp = DEV_SPI_ReadByte();
     DEV_Digital_Write(DEV_CS_PIN, 1);
     return temp;
