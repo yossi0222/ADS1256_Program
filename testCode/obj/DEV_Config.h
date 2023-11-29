@@ -65,7 +65,8 @@
  * delay x ms
 **/
 #define DEV_Delay_ms(__xms) bcm2835_delay(__xms)
-#define DEV_Delay_μs(__xμs) bcm2835_delayMicroseconds(__xμs)
+#define DEV_Delay_ns(__xns) bcm2835_delayMicroseconds(__xns)
+
 
 /*------------------------------------------------------------------------------------------------------*/
 UBYTE DEV_ModuleInit(void);
