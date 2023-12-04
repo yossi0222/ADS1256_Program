@@ -48,7 +48,7 @@ int main(void)
     }
 
     // CSVファイルにデータを保存
-    FILE *fp = fopen("data1.csv", "w");
+    FILE *fp = fopen("data.csv", "w");
     if (fp != NULL)
     {
         fprintf(fp, "Time,Data\n");
@@ -58,6 +58,23 @@ int main(void)
         }
         fclose(fp);
         printf("Data saved to data.csv\n");
+    }
+    else
+    {
+        printf("Error opening file\n");
+    }
+
+    // CSVファイルを読み取って表示
+    fp = fopen("data.csv", "r");
+    if (fp != NULL)
+    {
+        printf("\nReading data from data.csv\n");
+        char line[100];
+        while (fgets(line, sizeof(line), fp) != NULL)
+        {
+            printf("%s", line);
+        }
+        fclose(fp);
     }
     else
     {
