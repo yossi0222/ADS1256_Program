@@ -4,6 +4,7 @@
 #include "ADS1256.h"
 #include "stdio.h"
 #include <unistd.h> // usleep関数を利用するため
+#include <string.h>
 
 #define SAMPLE_COUNT 10000  // データを保存するサンプル数
 #define SAMPLING_PERIOD 70 // マイクロ秒単位でのサンプリング周期 (1秒 / 10kHz = 100μs)
@@ -46,11 +47,21 @@ int main(void)
         nanosleep(&sleep_time, NULL);
     }
 
-    // データと時間経過を一気に出力
-    printf("Data and Time\n");
-    for (int i = 0; i < data_index; i++)
+    // CSVファイルにデータを保存
+    FILE *fp = fopen("data1.csv", "w");
+    if (fp != NULL)
     {
-        printf("Time: %lld nanoseconds | Data: %f\n", time_buffer[i], data_buffer[i]);
+        fprintf(fp, "Time,Data\n");
+        for (int i = 0; i < data_index; i++)
+        {
+            fprintf(fp, "%lld,%f\n", time_buffer[i], data_buffer[i]);
+        }
+        fclose(fp);
+        printf("Data saved to data.csv\n");
+    }
+    else
+    {
+        printf("Error opening file\n");
     }
 
     DEV_ModuleExit();
