@@ -29,7 +29,7 @@ int main(void)
     timespec_get(&start_time, TIME_UTC); // 現在の時間を取得
 
     int data_index = 0;
-    struct timespec sleep_time = {0, SAMPLING_PERIOD * 1000}; // サンプリング周期に合わせて待機時間を設定
+    struct timespec sleep_time = {0, SAMPLING_PERIOD * 100}; // サンプリング周期に合わせて待機時間を設定
 
     while ((current_time.tv_sec - start_time.tv_sec) < TARGET_TIME) // 目標の時間までデータを取得する
     {
