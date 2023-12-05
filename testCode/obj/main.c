@@ -19,7 +19,7 @@ int main(void)
     if (ADS1256_init() == 1)
     {
         printf("\r\nEND                  \r\n");
-        DEV_ModuleエータExit();
+        DEV_ModuleExit();
         exit(0);
     }
 
