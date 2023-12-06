@@ -7,7 +7,7 @@
 #include <string.h>
 
 #define SAMPLE_COUNT 15000  // データを保存するサンプル数
-#define SAMPLING_PERIOD 50 // マイクロ秒単位でのサンプリング周期 (1秒 / 10kHz = 100μs)
+#define SAMPLING_PERIOD 150 // マイクロ秒単位でのサンプリング周期 (1秒 / 10kHz = 100μs)
 #define TARGET_TIME 2// 目標の取得時間（秒）
 
 int main(void)
